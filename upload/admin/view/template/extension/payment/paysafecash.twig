@@ -1,0 +1,251 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+            <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+    </ul>
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <button type="submit" form="form-payment" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+                <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+            <h1><i class="fa fa-credit-card"></i> {{ heading_title }}</h1>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="panel-body">
+            {% if error_warning %}
+                <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                </div>
+            {% endif %}
+            <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-payment" class="form-horizontal">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_settings }}</a></li>
+                    <li ><a href="#tab-about" data-toggle="tab">{{ tab_about }}</a></li>
+                </ul>
+                <div class="tab-content">
+
+                    <div class="tab-pane active" id="tab-general">
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="" data-original-title="{{ entry_paysafecash_test_mode }}">{{ text_paysafecash_test_mode }}</span></label>
+                            <div class="col-sm-10">
+                                {% if paysafecash_test_mode %}
+                                    <label class="radio-inline"><input type="radio" name="paysafecash_test_mode" value="1" checked="checked"> {{ text_yes }}</label>
+                                    <label class="radio-inline"><input type="radio" name="paysafecash_test_mode" value="0"> {{ text_no }}</label>
+                                {% else %}
+                                    <label class="radio-inline"><input type="radio" name="paysafecash_test_mode" value="1" > {{ text_yes }}</label>
+                                    <label class="radio-inline"><input type="radio" name="paysafecash_test_mode" value="0" checked="checked"> {{ text_no }}</label>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="paysafecash_api_key"><span data-toggle="tooltip" title="" data-original-title="{{ entry_paysafecash_api_key }}">{{ text_paysafecash_api_key }}</span></label>
+                            <div class="col-sm-10">
+                                <input type="text" name="paysafecash_api_key" value="{{ paysafecash_api_key }}"  class="form-control" id="paysafecash_api_key" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="paysafecash_webhook_rsa_key"><span data-toggle="tooltip" title="" data-original-title="{{ entry_paysafecash_webhook_rsa_key }}">{{ text_paysafecash_webhook_rsa_key }}</span></label>
+                            <div class="col-sm-10">
+                                <textarea name="paysafecash_webhook_rsa_key" class="form-control" id="paysafecash_webhook_rsa_key" cols="20" rows="5">{{ paysafecash_webhook_rsa_key }}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="paysafecash_var_trans_timeout"><span data-toggle="tooltip" title="" data-original-title="{{ entry_paysafecash_var_trans_timeout }}">{{ text_paysafecash_var_trans_timeout }}</span></label>
+                            <div class="col-sm-10">
+                                <input type="text" name="paysafecash_var_trans_timeout" value="{{ paysafecash_var_trans_timeout }}"  class="form-control" id="paysafecash_var_trans_timeout" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="paysafecash_submerchant_id"><span data-toggle="tooltip" title="" data-original-title="{{ entry_paysafecash_submerchant_id }}">{{ text_paysafecash_submerchant_id }}</span></label>
+                            <div class="col-sm-10">
+                                <input type="text" name="paysafecash_submerchant_id" value="{{ paysafecash_submerchant_id }}"  class="form-control" id="paysafecash_submerchant_id" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" ><span data-toggle="tooltip" title="" data-original-title="{{ entry_paysafecash_customer_data }}">{{ text_paysafecash_customer_data }}</span></label>
+                            <div class="col-sm-10">
+                                <label class="checkbox-inline"><input type="checkbox" name="paysafecash_customer_data" {{ paysafecash_customer_data == 1 ? 'checked="checked"' : '' }} value="1"> {{ text_yes }}</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="paysafecash_countries"><span data-toggle="tooltip" title="" data-original-title="{{ entry_paysafecash_countries }}">{{ text_paysafecash_countries }}</span></label>
+                            <div class="col-sm-10">
+                                <select name="paysafecash_countries[]" multiple="multiple" class="form-control">
+                                    {% for country in countries %}
+                                        {% if country.iso_code_2 in paysafecash_countries %}
+                                        <option value="{{ country.iso_code_2 }}" selected="selected">{{ country.name }}</option>
+                                        {% else %}
+                                        <option value="{{ country.iso_code_2 }}">{{ country.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" ><span data-toggle="tooltip" title="" data-original-title="{{ entry_paysafecash_debug_mode }}">{{ text_paysafecash_debug_mode }}</span></label>
+                            <div class="col-sm-10">
+                                <label class="checkbox-inline"><input type="checkbox" name="paysafecash_debug_mode" {{ paysafecash_debug_mode == 1 ? 'checked="checked"' : '' }} value="1"> {{ text_paysafecash_enable_debug_mode }}</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="input-order-status">{{ entry_order_status }}</label>
+                            <div class="col-sm-10">
+                                <select name="paysafecash_order_status_id" id="input-order-status" class="form-control">
+                                    {% for order_status in order_statuses %}
+                                        {% if order_status.order_status_id == paysafecash_order_status_id %}
+                                            <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                        {% else %}
+                                            <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="input-declined-order-status">{{ entry_declined_order_status }}</label>
+                            <div class="col-sm-10">
+                                <select name="paysafecash_declined_order_status_id" id="input-declined-order-status" class="form-control">
+                                    {% for order_status in order_statuses %}
+                                        {% if order_status.order_status_id == paysafecash_declined_order_status_id %}
+                                            <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                        {% else %}
+                                            <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="input-awaiting-order-status">{{ entry_awaiting_order_status }}</label>
+                            <div class="col-sm-10">
+                                <select name="paysafecash_awaiting_order_status_id" id="input-awaiting-order-status" class="form-control">
+                                    {% for order_status in order_statuses %}
+                                        {% if order_status.order_status_id == paysafecash_awaiting_order_status_id %}
+                                            <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                        {% else %}
+                                            <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="input-awaiting-order-status">{{ entry_refund_order_status }}</label>
+                            <div class="col-sm-10">
+                                <select name="paysafecash_refund_order_status_id" id="input-refund-order-status" class="form-control">
+                                    {% for order_status in order_statuses %}
+                                        {% if order_status.order_status_id == paysafecash_refund_order_status_id %}
+                                            <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+                                        {% else %}
+                                            <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+
+                        {% for language in languages %}
+                        <div class="form-group required">
+                            <label class="col-sm-2 control-label" for="input-payment_description{{ language.language_id }}">{{ entry_payment_description }}</label>
+                            <div class="col-sm-10">
+                                <div class="input-group"><span class="input-group-addon"><img src="{{ language.image }}" title="{{ language.name }}" /></span>
+                                    <textarea name="paysafecash_payment_description{{ language.language_id }}" cols="80" rows="10" placeholder="{{ entry_payment_description }}" id="input-payment_description{{ language.language_id }}" class="form-control">{{ _context['paysafecash_payment_description' ~ language.language_id] is defined ? _context['paysafecash_payment_description' ~ language.language_id] : '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group required">
+                            <label class="col-sm-2 control-label" for="input-confirm_description{{ language.language_id }}">{{ entry_confirm_description }}</label>
+                            <div class="col-sm-10">
+                                <div class="input-group"><span class="input-group-addon"><img src="{{ language['image'] }}" title="{{ language['name'] }}" /></span>
+                                    <textarea name="paysafecash_confirm_description{{ language.language_id }}" cols="80" rows="10" placeholder="{{ entry_confirm_description }}" id="input-confirm_description{{ language.language_id }}" class="form-control">{{ _context['paysafecash_confirm_description' ~ language.language_id] is defined ? _context['paysafecash_confirm_description' ~ language.language_id] : '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+                            <div class="col-sm-10">
+                                <select name="payment_paysafecash_status" id="input-status" class="form-control">
+                                    {% if payment_paysafecash_status %}
+                                        <option value="1" selected="selected">{{ text_enabled }}</option>
+                                        <option value="0">{{ text_disabled }}</option>
+                                    {% else %}
+                                        <option value="1">{{ text_enabled }}</option>
+                                        <option value="0" selected="selected">{{ text_disabled }}</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="input-sort-order">{{ entry_sort_order }}</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="payment_paysafecash_sort_order" value="{{ payment_paysafecash_sort_order }}" placeholder="{{ entry_sort_order }}" id="input-sort-order" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab-about">
+                        <h2>{{ text_current_version }}: {{ text_current_version_nr }}</h2>
+
+
+                        <div id="version-data-checker" style="margin-bottom: 20px">
+                            {{ vrs_please_check_version }}
+                        </div>
+                        <div style="margin-bottom: 20px">
+                            <button type="button" id="version-data-checker-btn" class="btn btn-sm btn-info">{{ button_check }}</button>
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="view/javascript/summernote/summernote.js"></script>
+<link href="view/javascript/summernote/summernote.css" rel="stylesheet" />
+<script type="text/javascript" src="view/javascript/summernote/opencart.js"></script>
+<script type="text/javascript"><!--
+{% for language in languages %}
+$('#input-payment_description{{ language.language_id }}').summernote({height: 300});
+$('#input-confirm_description{{ language.language_id }}').summernote({height: 300});
+{% endfor %}
+
+$("#version-data-checker-btn").on("click", function() {
+    $("#version-data-checker").html('<span class="fa fa-cog fa-spin fa-3x fa-fw"></span>');
+    $.ajax({type: "GET",
+        url: "{{ link_check_version }}",
+        dataType: "json",
+        success: function(obj){
+            if (obj.status == 1) {
+                var html = '<p>{{ vrs_latest_version }}: <strong>'+obj.data.latest_version+'</strong></p>';
+                html += '<p>{{ vrs_last_update }}: <strong>'+obj.data.lastupdate+'</strong></p>';
+                html += '<p>{{ vrs_changelog }}<ol>';
+                obj.data.changelog.forEach(async function(chng) {
+                    html += '<li>'+chng+'</li>';
+                });
+                html += '</ol></p>';
+                $("#version-data-checker").html(html);
+            } else {
+                alert(obj.msg);
+            }
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            $("#version-data-checker").html('{{ vrs_please_check_version }}');
+            alert(textStatus);
+        }
+    });
+
+    return false;
+});
+
+//--></script>
+{{ footer }}

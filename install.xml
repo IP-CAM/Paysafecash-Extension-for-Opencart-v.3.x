@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+    <name>Paysafe:cash Modification</name>
+    <version>1.0.0</version>
+    <author>Paysafe</author>
+    <code>paysafecash</code>
+    <file path="admin/controller/common/column_left.php">
+        <operation>
+            <search><![CDATA[return $this->load->view('common/column_left', $data);]]></search>
+            <add position="before"><![CDATA[
+        if (version_compare(VERSION, '3.0.0.0', '<')) {
+            //paysafecash oc2.3.*
+            $data['menus'][] = array(
+                'id'       => 'menu-paysafecash',
+                'icon'     => 'fa-money',
+                'name'     => 'Paysafe:cash',
+                'href'     => $this->url->link('extension/payment/paysafecash/listorders' , 'token=' . $this->session->data['token'], true),
+                'children' => array()
+            );
+        } else {
+            //paysafecash oc3.*
+            $data['menus'][] = array(
+                'id'       => 'menu-paysafecash',
+                'icon'     => 'fa-money',
+                'name'     => 'Paysafe:cash',
+                'href'     => $this->url->link('extension/payment/paysafecash/listorders' , 'user_token=' . $this->session->data['user_token'], true),
+                'children' => array()
+            );
+        }
+]]></add>
+        </operation>
+    </file>
+</modification>
