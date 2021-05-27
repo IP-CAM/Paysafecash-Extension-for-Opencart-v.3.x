@@ -4,7 +4,7 @@ class ControllerExtensionPaymentPaysafecash extends Controller
     private $error = [];
 
     // current version
-    private $version = '1.0.0';
+    private $version = '1.1.0';
 
     // url to check for updates
     private $version_url = 'https://raw.githubusercontent.com/Paysafecard-DEV/paysafecash-opencart-3.x-1.0/master/version.json';

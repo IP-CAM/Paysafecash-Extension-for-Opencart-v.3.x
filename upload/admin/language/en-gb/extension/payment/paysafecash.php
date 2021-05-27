@@ -1,6 +1,6 @@
 <?php
 // Heading
-$_['heading_title'] = 'Paysafe:cash 1.0.0';
+$_['heading_title'] = 'Paysafe:cash 1.1.0';
 
 // Text
 $_['text_paysafecash'] = '<img src="view/image/payment/paysafe_cash.png" alt="Paysafe:cash" title="Paysafe:cash" style="height: 30px"></a>';

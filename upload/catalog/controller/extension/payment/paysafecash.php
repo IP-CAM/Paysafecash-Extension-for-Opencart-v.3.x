@@ -2,7 +2,7 @@
 class ControllerExtensionPaymentPaysafecash extends Controller
 {
     // current version
-    private $version = '1.0.0';
+    private $version = '1.1.0';
 
     // load PaymentClass and connect
     private function get_connection()
