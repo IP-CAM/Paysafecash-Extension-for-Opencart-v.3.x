@@ -1,1 +1,1 @@
-# paysafecash-opencart-3.x-1.0
+# paysafecash-opencart-3.x-1.1
