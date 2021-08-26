@@ -4,7 +4,7 @@ class ControllerExtensionPaymentPaysafecash extends Controller
     private $error = [];
 
     // current version
-    private $version = '1.1.0';
+    private $version = '1.2.0';
 
     // url to check for updates
     private $version_url = 'https://raw.githubusercontent.com/Paysafecard-DEV/paysafecash-opencart-3.x-1.0/master/version.json';
@@ -645,11 +645,7 @@ class ControllerExtensionPaymentPaysafecash extends Controller
                         $customer_hash = md5($order_info[0]['email']);
                     }
 
-                    if ($test_mode) {
-                        $order_amount = 1;
-                    } else {
-                        $order_amount = $this->currency->format($order_info[0]['total'], $order_info[0]['currency_code'], $order_info[0]['currency_value'], false);
-                    }
+                    $order_amount = $this->currency->format($order_info[0]['total'], $order_info[0]['currency_code'], $order_info[0]['currency_value'], false);
 
                     $data_payment = [
                         'payment_id' => $order_info[0]['payment_id'],
@@ -659,7 +655,7 @@ class ControllerExtensionPaymentPaysafecash extends Controller
                         'customer_mail' => $order_info[0]['email'],
                         'correlation_id' => '',
                         'submerchant_id' => '',
-                        'shop_id' => $order_info[0]["store_name"]." ".VERSION." | ".$this->version,
+                        'shop_id' => "Opencart ".VERSION." | ".$this->version,
                     ];
 
                     if ($debug_mode) {

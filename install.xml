@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <modification>
     <name>Paysafe:cash Modification</name>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
     <author>Paysafe</author>
     <code>paysafecash</code>
     <file path="admin/controller/common/column_left.php">

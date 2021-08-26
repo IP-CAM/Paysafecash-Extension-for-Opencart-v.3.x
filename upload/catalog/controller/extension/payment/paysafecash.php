@@ -2,7 +2,7 @@
 class ControllerExtensionPaymentPaysafecash extends Controller
 {
     // current version
-    private $version = '1.1.0';
+    private $version = '1.2.0';
 
     // load PaymentClass and connect
     private function get_connection()
@@ -31,7 +31,7 @@ class ControllerExtensionPaymentPaysafecash extends Controller
         $data['redirect_url'] =  $this->url->link('extension/payment/paysafecash/redirect', '', true);
         $data['payment_title'] =  $this->language->get('payment_title');
         $data['button_proceed'] =  $this->language->get('button_proceed');
-        $data['confirm_description'] =  html_entity_decode($this->config->get('paysafecash_confirm_description' . $this->config->get('config_language_id')), ENT_QUOTES, 'UTF-8');
+        $data['payment_description'] =  $this->language->get('payment_description');
 
         if ($debug_mode) {
             $this->log->write('FRONT (paysafe:cash): Start ');
@@ -79,18 +79,12 @@ class ControllerExtensionPaymentPaysafecash extends Controller
             $this->response->redirect($this->url->link('checkout/checkout', '', true));
         }
 
-        // if test mode then order amount is 1
-        if ($test_mode) {
-            $order_amount = 1;
-        } else {
-            $order_amount = $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false);
-        }
+        $order_amount = $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false);
 
         $pscpayment = $this->get_connection();
         $success_url = $this->url->link('extension/payment/paysafecash/success'.'&order_id=' . $order_info["order_id"]);
         $failure_url = $this->url->link('extension/payment/paysafecash/failure'.'&order_id=' . $order_info["order_id"]);
         $webhook_url = $this->url->link('extension/payment/paysafecash/webhook'.'&order_id=' . $order_info["order_id"]);
-        $notification_url = $this->url->link('extension/payment/paysafecash/notification'.'&order_id=' . $order_info["order_id"]);
 
         // if settings timeout is set then convert to minutes
         if ($timeout_limit > 0) {
@@ -115,6 +109,7 @@ class ControllerExtensionPaymentPaysafecash extends Controller
                 "address1"     => $order_info['payment_address_1'],
                 "postcode"     => $order_info['payment_postcode'],
                 "city"         => $order_info['payment_city'],
+                "country_iso2" => $order_info['payment_iso_code_2'],
                 "phone_number" => $order_info['telephone'],
                 "email"        => $order_info['email']
             ];
@@ -129,7 +124,6 @@ class ControllerExtensionPaymentPaysafecash extends Controller
             'REMOTE_ADDR' => $this->request->server['REMOTE_ADDR'],
             'success_url' => $success_url."&payment_id={payment_id}",
             'failure_url' => $failure_url."&payment_id={payment_id}",
-            'notification_url' => $notification_url."&payment_id={payment_id}",
             'webhook_url' => $webhook_url,
             'customer_data' => $customer_data,
             'time_limit' => $timeout_limit,
@@ -137,8 +131,8 @@ class ControllerExtensionPaymentPaysafecash extends Controller
             'country_restriction' => $this->config->get('paysafecash_countries'),
             'kyc_restriction' => '',
             'min_age' => '',
-            'shop_id' => $order_info["store_name"]." ".VERSION." | ".$this->version,
-            'env' => ($env == 'TEST' ? '' : $paysafecash_submerchant_id),
+            'shop_id' => "Opencart ".VERSION." | ".$this->version,
+            'env' => '',
         ];
 
         if ($debug_mode) {
@@ -153,7 +147,7 @@ class ControllerExtensionPaymentPaysafecash extends Controller
             $data_payment['REMOTE_ADDR'],
             $data_payment['success_url'],
             $data_payment['failure_url'],
-            $data_payment['notification_url'],
+            '',
             $data_payment['webhook_url'],
             $data_payment['customer_data'],
             $data_payment['time_limit'],
@@ -279,11 +273,14 @@ class ControllerExtensionPaymentPaysafecash extends Controller
                     }
                     $this->model_extension_payment_paysafecash->validatePaymentOrder($order_id, (int)$this->config->get('paysafecash_awaiting_order_status_id'), $payment_id);
                     if ($this->customer->isLogged()) {
-                        $redirect = $this->url->link('account/order/info', 'order_id=' . $order_id);
+                        //$redirect = $this->url->link('account/order/info', 'order_id=' . $order_id);
+                        $redirect = $this->url->link('checkout/success');
                     } else {
                         $redirect = $this->url->link('checkout/success');
                     }
                 } elseif ($response["status"] == "EXPIRED") {
+                    $this->model_payment_paysafecash->validatePaymentOrder($order_id, (int)$this->config->get('paysafecash_declined_order_status_id'), $payment_id);
+                    $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('paysafecash_declined_order_status_id'), "Declined by expiration (EXPIRED)!", false);
                 } elseif ($response["status"] == "AUTHORIZED") {
                     $response_capture = $pscpayment->capturePayment($payment_id);
                     if ($debug_mode) {
@@ -360,9 +357,8 @@ class ControllerExtensionPaymentPaysafecash extends Controller
         $debug_mode = $this->config->get('paysafecash_debug_mode');
 
         if ($debug_mode) {
-            $debug_mode = $this->config->get('paysafecash_debug_mode');
+            $this->log->write('FRONT (paysafe:cash => failure): ('.$this->request->server['REQUEST_URI'].') Transaction aborted by the user: '.print_r($this->request->get, true));
         }
-        $this->log->write('FRONT (paysafe:cash => failure): ('.$this->request->server['REQUEST_URI'].') Transaction aborted by the user: '.print_r($this->request->get, true));
 
         $order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
         $payment_id = isset($this->request->get['payment_id']) ? $this->request->get['payment_id'] : '';
@@ -372,94 +368,6 @@ class ControllerExtensionPaymentPaysafecash extends Controller
             $this->model_checkout_order->addOrderHistory($order_info["order_id"], $this->config->get('paysafecash_declined_order_status_id'), "Declined by client!", false);
         }
         $this->response->redirect($this->url->link('checkout/checkout', '', true));
-    }
-
-    // this is not enabled
-    public function notification()
-    {
-        $this->load->model('checkout/order');
-        $this->load->model('extension/payment/paysafecash');
-
-        $debug_mode = $this->config->get('paysafecash_debug_mode');
-        if ($debug_mode) {
-            $this->log->write('FRONT (paysafe:cash => notification): ('.$this->request->server['REQUEST_URI'].') '.print_r($this->request->get, true));
-        }
-
-        $order_id = isset($this->request->get['order_id']) ? $this->request->get['order_id'] : 0;
-        $payment_id = isset($this->request->get['payment_id']) ? $this->request->get['payment_id'] : '';
-
-        if ($debug_mode) {
-            $this->log->write('FRONT (paysafe:cash => notification): Start (order_id='.$order_id.' payment_id='.$payment_id.')');
-        }
-
-        if (!($order_id > 0)) {
-            if ($debug_mode) {
-                $this->log->write('FRONT (paysafe:cash => notification): No order id! ');
-            }
-            return false;
-        }
-
-        if ($order_id && $payment_id) {
-            $order_info = $this->model_checkout_order->getOrder($order_id);
-            if (!count($order_info)) {
-                if ($debug_mode) {
-                    $this->log->write('FRONT (paysafe:cash => notification): Order not found! ');
-                }
-                return false;
-            }
-
-            $payment_status = $this->config->get('paysafecash_order_status_id');
-            $pscpayment = $this->get_connection();
-            $response = $pscpayment->retrievePayment($payment_id);
-
-            if ($response == false) {
-                if ($debug_mode) {
-                    $this->log->write('FRONT (paysafe:cash => notification): No response! ('.$this->request->server['REQUEST_URI'].') '.print_r($response, true));
-                }
-            } elseif (isset($response["object"])) {
-                if ($response["status"] == "SUCCESS") {
-                    if ($debug_mode) {
-                        $this->log->write('FRONT (paysafe:cash => notification): status=SUCCESS! ('.$this->request->server['REQUEST_URI'].') '.print_r($response, true));
-                    }
-                    if ($order_info['order_status_id'] == (int)$this->config->get('paysafecash_awaiting_order_status_id')) {
-                        $this->model_extension_payment_paysafecash->validatePaymentOrder($order_id, (int)$this->config->get('paysafecash_order_status_id'), $payment_id);
-                        $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('paysafecash_order_status_id'), "Payment ID: ".$payment_id, true);
-
-                        if ($debug_mode) {
-                            $this->log->write('FRONT (paysafe:cash => notification): status='.$response["status"].' add order history! Payment ID: '.$payment_id);
-                        }
-
-                        if ($debug_mode) {
-                            $this->log->write('FRONT (paysafe:cash => notification): status='.$response["status"].' validate order database! Payment ID: '.$payment_id);
-                        }
-                    }
-                } elseif ($response["status"] == "INITIATED" || $response["status"] == "REDIRECTED") {
-                } elseif ($response["status"] == "EXPIRED") {
-                } elseif ($response["status"] == "AUTHORIZED") {
-                    $response_capture = $pscpayment->capturePayment($payment_id);
-                    if ($debug_mode) {
-                        $this->log->write('FRONT (paysafe:cash => notification): status='.$response["status"].' ('.$this->request->server['REQUEST_URI'].') Capture payment response! '.print_r($response_capture, true));
-                    }
-                    if ($response_capture == true) {
-                        if ($debug_mode) {
-                            $this->log->write('FRONT (paysafe:cash => notification): status='.$response["status"].' Success Transaction before! ');
-                        }
-                        if (isset($response_capture["object"])) {
-                            if ($response_capture["status"] == "SUCCESS") {
-                                $this->model_extension_payment_paysafecash->validatePaymentOrder($order_id, (int)$this->config->get('paysafecash_order_status_id'), $payment_id);
-                                $this->model_checkout_order->addOrderHistory($order_id, (int)$this->config->get('paysafecash_order_status_id'), "Payment ID: ".$payment_id, true);
-
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            if ($debug_mode) {
-                $this->log->write('FRONT (paysafe:cash => notification): Order or Payment not available! ');
-            }
-        }
     }
 
     // webhook function to finalize order

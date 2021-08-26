@@ -1,4 +1,3 @@
-
 <?php echo $header; ?><?php echo $column_left; ?>
 <div id="content">
     <ul class="breadcrumb">
@@ -59,12 +58,6 @@
                             <label class="col-sm-2 control-label" for="paysafecash_var_trans_timeout"><span data-toggle="tooltip" title="" data-original-title="<?php echo $entry_paysafecash_var_trans_timeout; ?>"><?php echo $text_paysafecash_var_trans_timeout; ?></span></label>
                             <div class="col-sm-10">
                                 <input type="text" name="paysafecash_var_trans_timeout" value="<?php echo $paysafecash_var_trans_timeout; ?>"  class="form-control" id="paysafecash_var_trans_timeout" />
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label" for="paysafecash_submerchant_id"><span data-toggle="tooltip" title="" data-original-title="<?php echo $entry_paysafecash_submerchant_id; ?>"><?php echo $text_paysafecash_submerchant_id; ?></span></label>
-                            <div class="col-sm-10">
-                                <input type="text" name="paysafecash_submerchant_id" value="<?php echo $paysafecash_submerchant_id; ?>"  class="form-control" id="paysafecash_submerchant_id" />
                             </div>
                         </div>
                         <div class="form-group">
@@ -154,27 +147,6 @@
                             </div>
                         </div>
 
-
-                        <?php foreach ($languages as $language) { ?>
-                        <div class="form-group required">
-                            <label class="col-sm-2 control-label" for="input-payment_description<?php echo $language['language_id']; ?>"><?php echo $entry_payment_description; ?></label>
-                            <div class="col-sm-10">
-                                <div class="input-group"><span class="input-group-addon"><img src="<?php echo $language['image']; ?>" title="<?php echo $language['name']; ?>" /></span>
-                                    <textarea name="paysafecash_payment_description<?php echo $language['language_id']; ?>" cols="80" rows="10" placeholder="<?php echo $entry_payment_description; ?>" id="input-payment_description<?php echo $language['language_id']; ?>" class="form-control"><?php echo isset(${'paysafecash_payment_description'.$language['language_id']}) ? ${'paysafecash_payment_description'.$language['language_id']} : ''; ?></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group required">
-                            <label class="col-sm-2 control-label" for="input-confirm_description<?php echo $language['language_id']; ?>"><?php echo $entry_confirm_description; ?></label>
-                            <div class="col-sm-10">
-                                <div class="input-group"><span class="input-group-addon"><img src="<?php echo $language['image']; ?>" title="<?php echo $language['name']; ?>" /></span>
-                                    <textarea name="paysafecash_confirm_description<?php echo $language['language_id']; ?>" cols="80" rows="10" placeholder="<?php echo $entry_confirm_description; ?>" id="input-confirm_description<?php echo $language['language_id']; ?>" class="form-control"><?php echo isset(${'paysafecash_confirm_description'.$language['language_id']}) ? ${'paysafecash_confirm_description'.$language['language_id']} : ''; ?></textarea>
-                                </div>
-                            </div>
-                        </div>
-                        <?php } ?>
-
-
                         <div class="form-group">
                             <label class="col-sm-2 control-label" for="input-status"><?php echo $entry_status; ?></label>
                             <div class="col-sm-10">
@@ -217,10 +189,7 @@
 <link href="view/javascript/summernote/summernote.css" rel="stylesheet" />
 <script type="text/javascript" src="view/javascript/summernote/opencart.js"></script>
 <script type="text/javascript"><!--
-<?php foreach ($languages as $language) { ?>
-$('#input-payment_description<?php echo $language['language_id']; ?>').summernote({height: 300});
-$('#input-confirm_description<?php echo $language['language_id']; ?>').summernote({height: 300});
-<?php } ?>
+
 
 $("#version-data-checker-btn").on("click", function() {
     $("#version-data-checker").html('<span class="fa fa-cog fa-spin fa-3x fa-fw"></span>');

@@ -1,25 +1,19 @@
 {
     "oc2": {
-        "current_version": "1.1.0",
+        "current_version": "1.2.0",
         "changelog": [
-            "1",
-            "2",
-            "3",
-            "4",
-            "5"
+            "Remove Post Notification",
+            "Bug Fixes"
         ],
-        "last_update": "2021/05/10"
+        "last_update": "2021/08/26"
     },
     "oc23": {
-        "current_version": "1.1.0",
+        "current_version": "1.2.0",
         "changelog": [
-            "1",
-            "2",
-            "3",
-            "4",
-            "5"
+            "Remove Post Notification",
+            "Bug Fixes"
         ],
-        "last_update": "2021/05/10"
+        "last_update": "2021/08/26"
     }
 
 }
